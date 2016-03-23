@@ -1,6 +1,5 @@
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 
 public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
     @Override
@@ -11,7 +10,12 @@ public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("Connection ");
-        ReferenceCountUtil.release(msg);
+        System.out.println("Connection " + msg.toString());
+        ctx.write("Not correct remote address! Connection closed");
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) {
+        ctx.flush();
     }
 }
