@@ -1,5 +1,7 @@
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.CharsetUtil;
 
 public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
     @Override
@@ -10,8 +12,14 @@ public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("Connection " + msg.toString());
-        ctx.write("Not correct remote address! Connection closed");
+        ByteBuf in = (ByteBuf) msg;
+
+        try {
+            System.out.print(in.toString(CharsetUtil.US_ASCII));
+            System.out.flush();
+        } finally {
+            in.release();
+        }
     }
 
     @Override

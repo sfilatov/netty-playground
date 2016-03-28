@@ -1,21 +1,18 @@
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class DiscardServer {
+public class Server {
 
     private int port;
 
-    public DiscardServer(int port) {
+    public Server(int port) {
         this.port = port;
     }
 
-    public void run() throws InterruptedException {
+    public void run(ChannelInboundHandler handler) throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
 
@@ -26,7 +23,7 @@ public class DiscardServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new DiscardServerHandler());
+                            ch.pipeline().addLast(handler);
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -38,9 +35,5 @@ public class DiscardServer {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-	    new DiscardServer(4444).run();
     }
 }
